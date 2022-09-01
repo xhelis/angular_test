@@ -2,6 +2,7 @@ import { AuthService } from './../../services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -23,7 +24,7 @@ export class RegisterComponent implements OnInit {
       userName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-    })
+    });
   }
 
   createUser() {
@@ -31,25 +32,23 @@ export class RegisterComponent implements OnInit {
     if (this.loginForm.invalid) {
       return;
     }
-
+    Swal.fire({
+      title: 'Wait a minute, please',
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
     const { userName, email, password } = this.loginForm.value;
-    console.log('==============createUser======================================================');
-    console.log(this.loginForm);
-    console.log(this.loginForm.valid);
-    console.log(this.loginForm.value);
-    console.log('====================================================================');
     this.authService.createUser(userName, email, password).then(credentials => {
-      console.log('===================credentials=================================================');
-      console.log(credentials);
-      console.log('====================================================================');
+      Swal.close();
       this.router.navigate(['/']);
     }).catch(err => {
-      console.log('===========err=========================================================');
-      console.log(err);
-      console.log('====================================================================');
-    })
-
-
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: err.message
+      });
+    });
   }
 
 }
